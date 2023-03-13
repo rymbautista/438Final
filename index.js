@@ -3,19 +3,45 @@ let frogani;
 let happy = 100;
 let hunger = 100;
 let grab = 'false';
+let collisionTime = 0;
+let button;
+let name;
 
 function preload() {
   frogani = loadAnimation('images/Frogr1.png', 2);
+  froganiH = loadAnimation('images/FHat1.png', 2);
+  flyani = loadAnimation('images/Fly1.png', 2);
+  flyani.frameDelay = 10;
   frogani.frameDelay = 10;
+  froganiH.frameDelay = 10;
   ballI = loadImage('images/Ball.png');
   hatI = loadImage('images/Hat.png');
   bookI = loadImage('images/Book.png');
   cookieI = loadImage('images/Cookie.png');
+  wall = loadImage('images/Wall.png');
+  trashI = loadImage('images/Trash.png');
+  door = loadImage('images/Door.png');
+  shelf = loadImage('images/Shelf.png');
+  apple = loadImage('images/apple.png');
+  swall = loadImage('images/sWall.png');
+  //paint = loadImage();
+}
+
+function changeName() {
+  let newName = prompt("Enter a new name:");
+  
+  if (newName != null && newName != "") {
+    storeItem('name', newName);
+    name = newName;
+  }
 }
 
 function drawfrog() {
   frog = new Sprite();
-  //frogani.resize(50, 60);
+  frog.scale = .05;
+  frog.addAni('right', frogani, 1);
+  frog.addAni('hat', froganiH, 1);
+
 	frog.width = 50;
 	frog.height = 60;
     frog.x = 150;
@@ -58,10 +84,10 @@ function drawbook() {
 
 function drawtrash() {
   trash = new Sprite();
-  // ballI.resize(50, 50);
-  //   ball.addImage(ballI);
-    trash.diameter = 50;
-    trash.x = windowWidth/4;
+  trashI.resize(70, 70);
+  trash.addImage(trashI);
+    trash.diameter = 60;
+    trash.x = windowWidth- (windowWidth/4);
     trash.y = windowHeight-100;
     trash.color = '#817C74';
   
@@ -116,15 +142,22 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   drawtrash();
   drawfrog();
-  frog.scale = .05;
-  frog.addAni('right', frogani, 1);
   drawball();
   drawhat();
   drawbook();
   drawcookie();
   drawpainting();
   drawfly();
+  // fly.scale = .5;
+  // fly.addAni('right', flyani, 1);
   squareSequence();
+  button = createButton('✏');
+  button.position(110, 13);
+  button.mousePressed(changeName);
+  name = getItem('name');
+   if (name === null) {
+     name = 'Froggy';
+   }
 }
 
 async function squareSequence() {  
@@ -137,24 +170,30 @@ async function squareSequence() {
   squareSequence();
 }
 
-//ball.addEventListener("click", hungy());
-
 function hungy() {
   happy += 5;
 }
 
+function Fchange(item) {
+  
+  if (item = hat) {
+    collisionTime = millis();
+    frog.changeAnimation('hat');
+  }
+  if (millis() - collisionTime > 5000) {
+    frog.changeAnimation('right');
+  }
+}
+
 function draw() {
   clear();
-  background(220);
-  frog.ani = 'right';
+  //background(220);
+  image(wall, 0, 0, windowWidth, windowHeight);
+  frog.changeAnimation('right');
   // noStroke();
   fill('white'); 
-  // fly.position.x = mouseX;
-  // fly.position.y = mouseY;
   boundry();
   fly.moveTowards(mouse,1);
-  
-  // painting.mousepressed 
   
   happy -= 1/60;
 
@@ -194,12 +233,14 @@ function draw() {
     book.collider = 'dynamic';
     }
     if (hat.overlaps(frog)) {
+      //frog.changeAni('hat');
       happy += 5;
       hat.remove();
       drawhat();
+      Fchange(hat);
       cookie.collider = 'dynamic';
-    ball.collider = 'dynamic';
-    book.collider = 'dynamic';
+      ball.collider = 'dynamic';
+      book.collider = 'dynamic';
     }
   }
   
@@ -275,25 +316,32 @@ function draw() {
     hunger = 0;
   }
   
-  rect(windowWidth/2+20,windowHeight/3,200,windowHeight);//Door
-  rect(0,windowHeight-(windowHeight/10),windowWidth,windowHeight/10); //Floor
-  ellipse(windowWidth/3,windowHeight-(windowHeight/20),300,30); //Rug
-  quad(0,0,windowWidth/10,0,windowWidth/10,windowHeight-(windowHeight/10),0,windowHeight); //Left Wall
-  quad((windowWidth-(windowWidth/10)), 0, windowWidth,0, windowWidth, windowHeight,windowWidth-(windowWidth/10), windowHeight-(windowHeight/10)); //Right Wall
-  rect(windowWidth/5,windowHeight/2.2,200,25);  //Top Shelf
-  rect(windowWidth/5,windowHeight/1.5,200,25);  //Bottom Shelf
+  image(door, windowWidth/2+20, windowHeight/3, 200, windowHeight/1.75); //Door
+  fill('white');
+  image(swall, 0, 0, windowWidth/10, windowHeight); //Left Wall
+  image(swall, (windowWidth-(windowWidth/10)), 0, windowWidth/10, windowHeight); //Right Wall
+  fill(color('#F1E077'));
+  quad(windowWidth/10,windowHeight-(windowHeight/10),(windowWidth-(windowWidth/10)),windowHeight-(windowHeight/10), windowWidth,windowHeight,0,windowHeight); //Floor
   fill('green');
-  rect(10,10,happy,25); //Happy bar
+  ellipse(windowWidth/3,windowHeight-(windowHeight/20),300,30); //Rug
+  image(shelf, windowWidth/5, windowHeight/2.2, 200, 25);
+  image(shelf, windowWidth/5, windowHeight/1.5, 200, 25);
+  fill('white');
+  rect(7,9,140,100,10); //Stat BG
+  fill('green');
+  rect(40,45,happy,25,5); //Happy bar
+  image(apple, 10, 45, 25, 25); //Apple
   fill('rgb(221,183,78)');
-  rect(10,45,hunger,25); //Hunger Bar
+  rect(40,75,hunger,25,5); //Hunger Bar
   noFill();
-  rect(10,10,100,25); //Happy bar outline
-  rect(10,45,100,25); //Hunger Bar outline
+  rect(40,45,100,25,5); //Happy bar outline
+  rect(40,75,100,25,5); //Hunger Bar outline
+  image(apple, 10, 75, 25, 25); //Apple
   fill('black');
   textSize(23);
-  text(Math.floor(happy), 12, 12, [100], [25]); //happy points
-  text(hunger, 12, 47, [100], [25]); //hunger points  
-  text("Froggy", 12, 75, [100], [25]); //Name
+  text(Math.floor(happy), 42, 46, [100], [25]); //happy points
+  text(hunger, 42, 77, [100], [25]); //hunger points  
+  text(name, 12, 15, [100], [25]); //Name
   //drawSprites();
 }
 

@@ -5,13 +5,15 @@ let hunger = 100;
 let grab = 'false';
 let collisionTime = 0;
 let button;
+let guide;
 let name;
+let playbutton;
+let isPlaying = false;
 
 function preload() {
+  frogsong = loadSound('images/Frogsong.mp3');
   frogani = loadAnimation('images/Frogr1.png', 2);
   froganiH = loadAnimation('images/FHat1.png', 2);
-  flyani = loadAnimation('images/Fly1.png', 2);
-  flyani.frameDelay = 10;
   frogani.frameDelay = 10;
   froganiH.frameDelay = 10;
   ballI = loadImage('images/Ball.png');
@@ -23,8 +25,28 @@ function preload() {
   door = loadImage('images/Door.png');
   shelf = loadImage('images/Shelf.png');
   apple = loadImage('images/apple.png');
+  smile = loadImage('images/happy.png');
   swall = loadImage('images/sWall.png');
-  //paint = loadImage();
+  flyI = loadImage('images/Fly1.png');
+  paintI = loadImage('https://picsum.photos/200/300');
+}
+
+function playMusic() {
+  if (isPlaying) {
+    frogsong.stop();
+    isPlaying = false;
+    playButton.html('🔈');
+  } else {
+    frogsong.loop();
+    isPlaying = true;
+    frogsong.setVolume(0.25);
+    playButton.html('🔊');
+  }
+}
+
+
+function guidetext() {
+  alert('🐸Welcome to your Frog Friend!🐸\nOver time their happiness and hunger will go down.\nBalance feeding and playing with them to keep them satisfied by hovering and dragging items from the shelves to your froggy pal or try petting them!\nIf you pick up the wrong one drag it to the trash can. That is all you have to do to care for your froggy friend. Also, Rename them with the button next to their name!');
 }
 
 function changeName() {
@@ -54,7 +76,7 @@ function drawball() {
     ballI.resize(50, 50);
     ball.addImage(ballI);
     ball.diameter = 50;
-    ball.x = windowWidth/4;
+    ball.x = windowWidth/5 + 55;
     ball.y = windowHeight/2.2-25;
     ball.color = '#F44336';
     ball.layer = 1;
@@ -65,7 +87,7 @@ function drawhat() {
   hatI.resize(50, 50);
   hat.addImage(hatI);
     hat.diameter = 50;
-    hat.x = windowWidth/4 +100;
+    hat.x = windowWidth/5 + (200-55);
     hat.y = windowHeight/2.2-25;
     hat.color = '#3668F4';
     hat.layer = 1;
@@ -76,7 +98,7 @@ function drawbook() {
   bookI.resize(50, 50);
     book.addImage(bookI);
     book.diameter = 50;
-    book.x = windowWidth/4;
+    book.x = windowWidth/5 + 55;
     book.y = windowHeight/1.5-25;
     book.layer = 1;
     book.color = '#B78537';
@@ -98,7 +120,7 @@ function drawcookie() {
   cookieI.resize(50, 50);
   cookie.addImage(cookieI);
     cookie.diameter = 50;
-    cookie.x = windowWidth/4 +100;
+    cookie.x = windowWidth/5 + (200-55);
     cookie.y = windowHeight/1.5-25;
     cookie.layer = 1;
     cookie.color = '#EF9F60';
@@ -106,40 +128,58 @@ function drawcookie() {
 
 function drawpainting() {
   painting = new Sprite();
-  // ballI.resize(50, 50);
-  //   ball.addImage(ballI);
+  paintI.resize(300, 150);
+  painting.addImage(paintI);
 	painting.x = windowWidth/2;
 	painting.y = 150-45;
 	painting.width = 300;
 	painting.height = 150;
 	painting.color = '#EF9F60';
     painting.collider = 'none';
+    painting.layer = 1;
 }
 
 function drawfly() {
   fly = new Sprite();
+    fly.scale = .015;
+    fly.addImage(flyI);
     fly.layer = 2;
-    fly.diameter = 20;
+    fly.diameter = 50;
     fly.color = '#6D6A67';
-  boundry(fly);
 }
 
 function boundry() {
-  ball.position.x = constrain(ball.position.x, 0, width);
-  ball.position.y = constrain(ball.position.y, 0, height);
-  hat.position.x = constrain(hat.position.x, 0, width);
-  hat.position.y = constrain(hat.position.y, 0, height);
-  book.position.x = constrain(book.position.x, 0, width);
-  book.position.y = constrain(book.position.y, 0, height);
-  cookie.position.x = constrain(cookie.position.x, 0, width);
-  cookie.position.y = constrain(cookie.position.y, 0, height);
-  frog.position.x = constrain(frog.position.x, 0, width);
-  frog.position.y = constrain(frog.position.y, 0, height);
+  ball.position.x = constrain(ball.position.x, 25, width-25);
+  ball.position.y = constrain(ball.position.y, 25, height-25);
+  hat.position.x = constrain(hat.position.x, 25, width-25);
+  hat.position.y = constrain(hat.position.y, 25, height-25);
+  book.position.x = constrain(book.position.x, 25, width-25);
+  book.position.y = constrain(book.position.y, 25, height-25);
+  cookie.position.x = constrain(cookie.position.x, 25, width-25);
+  cookie.position.y = constrain(cookie.position.y, 25, height-25);
+  frog.position.x = constrain(frog.position.x, 25, width-25);
+  frog.position.y = constrain(frog.position.y, 25, height-25);
 }
 
 function setup() {
+  noCursor();
   frameRate(60);
   createCanvas(windowWidth, windowHeight);
+  button = createButton('📝');
+  button.position(110, 13);
+  button.mousePressed(changeName);
+  playButton = createButton('🎵');
+  playButton.size(35,30)
+  playButton.position(windowWidth-40, 13);
+  playButton.mousePressed(playMusic);
+  guide = createButton('📔');
+  guide.size(35,30)
+  guide.position(windowWidth-40, 48);
+  guide.mousePressed(guidetext);
+  name = getItem('name');
+   if (name === null) {
+     name = 'Froggy';
+   }
   drawtrash();
   drawfrog();
   drawball();
@@ -148,16 +188,7 @@ function setup() {
   drawcookie();
   drawpainting();
   drawfly();
-  // fly.scale = .5;
-  // fly.addAni('right', flyani, 1);
   squareSequence();
-  button = createButton('✏');
-  button.position(110, 13);
-  button.mousePressed(changeName);
-  name = getItem('name');
-   if (name === null) {
-     name = 'Froggy';
-   }
 }
 
 async function squareSequence() {  
@@ -170,32 +201,27 @@ async function squareSequence() {
   squareSequence();
 }
 
-function hungy() {
-  happy += 5;
-}
-
 function Fchange(item) {
   
   if (item = hat) {
     collisionTime = millis();
     frog.changeAnimation('hat');
   }
-  if (millis() - collisionTime > 5000) {
+  if (millis() - collisionTime > 10000) {
     frog.changeAnimation('right');
   }
 }
 
 function draw() {
   clear();
-  //background(220);
   image(wall, 0, 0, windowWidth, windowHeight);
-  frog.changeAnimation('right');
-  // noStroke();
+  frog.changeAnimation('hat');
   fill('white'); 
   boundry();
   fly.moveTowards(mouse,1);
   
   happy -= 1/60;
+  hunger -= 1/180;
 
   if (fly.overlapping(book)) {
     cookie.collider = 'none';
@@ -298,6 +324,7 @@ function draw() {
   if (fly.overlaps(trash)) {
     console.log("the trash is overlapped");
   }
+
   if (frog.overlaps(trash)) {
     console.log("the trash is overlapped");
   }
@@ -308,7 +335,6 @@ function draw() {
   if (hunger > 100) {
     hunger = 100;
   }
-  
   if (happy < 0) {
     happy = 0;
   }
@@ -316,7 +342,9 @@ function draw() {
     hunger = 0;
   }
   
-  image(door, windowWidth/2+20, windowHeight/3, 200, windowHeight/1.75); //Door
+  //image(door, windowWidth/2+20, windowHeight/3, 200, windowHeight/1.75,CONTAIN, LEFT); //Door
+  image(door, windowWidth/2+20, (windowHeight-(windowHeight/10) -315), 200, windowHeight/1.75, 0, 0, door.width, door.height, CONTAIN, LEFT);
+
   fill('white');
   image(swall, 0, 0, windowWidth/10, windowHeight); //Left Wall
   image(swall, (windowWidth-(windowWidth/10)), 0, windowWidth/10, windowHeight); //Right Wall
@@ -326,28 +354,54 @@ function draw() {
   ellipse(windowWidth/3,windowHeight-(windowHeight/20),300,30) //Rug
   image(shelf, windowWidth/5, windowHeight/2.2, 200, 25);
   image(shelf, windowWidth/5, windowHeight/1.5, 200, 25);
+  noStroke();
   fill('white');
   rect(7,9,140,100,10); //Stat BG
   fill('green');
   rect(40,45,happy,25,5); //Happy bar
-  image(apple, 10, 45, 25, 25); //Apple
+  image(smile, 10, 45, 25, 25); //Smile
   fill('rgb(221,183,78)');
   rect(40,75,hunger,25,5); //Hunger Bar
   noFill();
+  stroke('black')
+  strokeWeight(1);
   rect(40,45,100,25,5); //Happy bar outline
   rect(40,75,100,25,5); //Hunger Bar outline
   image(apple, 10, 75, 25, 25); //Apple
   fill('black');
   textSize(23);
+  noStroke();
   text(Math.floor(happy), 42, 46, [100], [25]); //happy points
-  text(hunger, 42, 77, [100], [25]); //hunger points  
+  text(Math.floor(hunger), 42, 77, [100], [25]); //hunger points  
   text(name, 12, 15, [100], [25]); //Name
   //drawSprites();
+
+  textSize(15);
+  if (happy > 50) {
+    text("I'm having fun right now!", 12, 150, [100], [25]); 
+  }
+  if (happy < 50 && happy > 25 ) {
+    text("I want to do something", 12, 150, [100], [25]); 
+  }
+  if (happy < 25 && happy != 0) {
+    text("I'm bored", 12, 150, [100], [25]); //Name
+  }
+  if (happy == 0) {
+    text("This place sucks", 12, 150, [100], [25]); //Name
+  }
+
+  if (hunger < 50 && hunger > 25 ) {
+    text("I'm Getting hungry :(", 12, 200, [100], [25]); 
+  }
+  if (hunger < 25 && hunger != 0) {
+    text("Feed me ;-;", 12, 200, [100], [25]); //Name
+  }
+  if (hunger == 0) {
+    text("I'm starving", 12, 200, [100], [25]); //Name
+  }
+
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
-
-
-//windos local storage and store item in p5

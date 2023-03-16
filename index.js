@@ -9,13 +9,20 @@ let guide;
 let name;
 let playbutton;
 let isPlaying = false;
+let item = 0;
 
 function preload() {
   frogsong = loadSound('images/Frogsong.mp3');
   frogani = loadAnimation('images/Frogr1.png', 2);
   froganiH = loadAnimation('images/FHat1.png', 2);
+  froganiBo = loadAnimation('images/FBook1.png', 2);
+  froganiBa = loadAnimation('images/FBall1.png', 2);
+  froganiC = loadAnimation('images/FCookie1.png', 2);
   frogani.frameDelay = 10;
   froganiH.frameDelay = 10;
+  froganiBo.frameDelay = 10;
+  froganiBa.frameDelay = 10;
+  froganiC.frameDelay = 10;
   ballI = loadImage('images/Ball.png');
   hatI = loadImage('images/Hat.png');
   bookI = loadImage('images/Book.png');
@@ -63,6 +70,9 @@ function drawfrog() {
   frog.scale = .05;
   frog.addAni('right', frogani, 1);
   frog.addAni('hat', froganiH, 1);
+  frog.addAni('book', froganiBo, 1);
+  frog.addAni('ball', froganiBa, 1);
+  frog.addAni('cookie', froganiC, 1);
 
 	frog.width = 50;
 	frog.height = 60;
@@ -182,6 +192,7 @@ function setup() {
    }
   drawtrash();
   drawfrog();
+  frog.changeAnimation('right');
   drawball();
   drawhat();
   drawbook();
@@ -202,20 +213,30 @@ async function squareSequence() {
 }
 
 function Fchange(item) {
-  
-  if (item = hat) {
+  if (item === hat) {
     collisionTime = millis();
     frog.changeAnimation('hat');
   }
-  if (millis() - collisionTime > 10000) {
-    frog.changeAnimation('right');
+  if (item === book) {
+    collisionTime = millis();
+    frog.changeAnimation('book');
+  }
+  if (item === ball) {
+    collisionTime = millis();
+    frog.changeAnimation('ball');
+  }
+  if (item === cookie) {
+    collisionTime = millis();
+    frog.changeAnimation('cookie');
   }
 }
 
 function draw() {
   clear();
   image(wall, 0, 0, windowWidth, windowHeight);
-  frog.changeAnimation('hat');
+  if (millis() - collisionTime > 5000) {
+    frog.changeAnimation('right');
+  }
   fill('white'); 
   boundry();
   fly.moveTowards(mouse,1);
@@ -229,6 +250,7 @@ function draw() {
     hat.collider = 'none';
     book.moveTowards(mouse,1);
     if (book.overlaps(trash)) {
+      hunger -= 1;
       book.remove();
       drawbook();
       cookie.collider = 'dynamic';
@@ -237,9 +259,10 @@ function draw() {
     }
     if (book.overlaps(frog)) {
       hunger -= 10;
-      happy += 5;
+      happy += 10;
       book.remove();
       drawbook();
+      Fchange(book);
       cookie.collider = 'dynamic';
       ball.collider = 'dynamic';
       hat.collider = 'dynamic';
@@ -252,6 +275,7 @@ function draw() {
     book.collider = 'none';
     hat.moveTowards(mouse,1);
     if (hat.overlaps(trash)) {
+      hunger -= 1;
       hat.remove();
       drawhat();
       cookie.collider = 'dynamic';
@@ -259,8 +283,8 @@ function draw() {
     book.collider = 'dynamic';
     }
     if (hat.overlaps(frog)) {
-      //frog.changeAni('hat');
       happy += 5;
+      hunger -= 3;
       hat.remove();
       drawhat();
       Fchange(hat);
@@ -276,6 +300,7 @@ function draw() {
     hat.collider = 'none';
     cookie.moveTowards(mouse,1);
     if (cookie.overlaps(trash)) {
+      hunger -= 1;
       cookie.remove();
       drawcookie();
       book.collider = 'dynamic';
@@ -284,8 +309,10 @@ function draw() {
     }
     if (cookie.overlaps(frog)) {
       hunger += 10;
+      happy += 2;
       cookie.remove();
       drawcookie();
+      Fchange(cookie);
       book.collider = 'dynamic';
     ball.collider = 'dynamic';
     hat.collider = 'dynamic';
@@ -298,6 +325,7 @@ function draw() {
     hat.collider = 'none';
     ball.moveTowards(mouse,1);
     if (ball.overlaps(trash)) {
+      hunger -= 1;
       ball.remove();
       drawball();
       book.collider = 'dynamic';
@@ -309,6 +337,7 @@ function draw() {
       happy += 5;
       ball.remove();
       drawball();
+      Fchange(ball);
       book.collider = 'dynamic';
       cookie.collider = 'dynamic';
       hat.collider = 'dynamic';
@@ -342,7 +371,6 @@ function draw() {
     hunger = 0;
   }
   
-  //image(door, windowWidth/2+20, windowHeight/3, 200, windowHeight/1.75,CONTAIN, LEFT); //Door
   image(door, windowWidth/2+20, (windowHeight-(windowHeight/10) -315), 200, windowHeight/1.75, 0, 0, door.width, door.height, CONTAIN, LEFT);
 
   fill('white');
@@ -374,30 +402,56 @@ function draw() {
   text(Math.floor(happy), 42, 46, [100], [25]); //happy points
   text(Math.floor(hunger), 42, 77, [100], [25]); //hunger points  
   text(name, 12, 15, [100], [25]); //Name
-  //drawSprites();
+  drawSprites();
+  noFill();
+  stroke(color('#BD8B32'));
+  strokeWeight(10);
+  rect(windowWidth/2-150,150-45-75,300,150,10);
 
+  noStroke();
   textSize(15);
   if (happy > 50) {
-    text("I'm having fun right now!", 12, 150, [100], [25]); 
+    fill(color('#95F192'));
+    rect(7,115,110,44,10);
+    fill('black');
+    text("I'm having fun right now!", 12, 120, [100], [25]); 
   }
   if (happy < 50 && happy > 25 ) {
-    text("I want to do something", 12, 150, [100], [25]); 
+    fill(color('#F1ED92'));
+    rect(7,115,110,44,10); 
+    fill('black');
+    text("I want to do something", 12, 120, [100], [25]); 
   }
   if (happy < 25 && happy != 0) {
-    text("I'm bored", 12, 150, [100], [25]); //Name
+    fill(color('#F1C392'));
+    rect(7,115,110,25,10); 
+    fill('black');
+    text("I'm bored", 12, 120, [100], [25]); 
   }
-  if (happy == 0) {
-    text("This place sucks", 12, 150, [100], [25]); //Name
+  if (happy < 1) {
+    fill(color('#F1AA92'));
+    rect(7,115,110,44,10); 
+    fill('black');
+    text("This place sucks", 12, 120, [100], [25]); 
   }
 
   if (hunger < 50 && hunger > 25 ) {
-    text("I'm Getting hungry :(", 12, 200, [100], [25]); 
+    fill(color('#F1ED92'));
+    rect(7,165,110,44,10); 
+    fill('black');
+    text("I'm Getting hungry :(", 12, 170, [100], [25]); 
   }
   if (hunger < 25 && hunger != 0) {
-    text("Feed me ;-;", 12, 200, [100], [25]); //Name
+    fill(color('#F1C392'));
+    rect(7,165,110,25,10); 
+    fill('black');
+    text("Feed me ;-;", 12, 170, [100], [25]); //Name
   }
-  if (hunger == 0) {
-    text("I'm starving", 12, 200, [100], [25]); //Name
+  if (hunger < 1) {
+    fill(color('#F1AA92'));
+    rect(7,165,110,25,10); 
+    fill('black');
+    text("I'm starving", 12, 170, [100], [25]); //Name
   }
 
 }

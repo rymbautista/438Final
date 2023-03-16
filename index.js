@@ -32,7 +32,7 @@ function preload() {
   door = loadImage('images/Door.png');
   shelf = loadImage('images/Shelf.png');
   apple = loadImage('images/apple.png');
-  smile = loadImage('images/happy.png');
+  smile = loadImage('images/Happy.png');
   swall = loadImage('images/sWall.png');
   flyI = loadImage('images/Fly1.png');
   paintI = loadImage('https://picsum.photos/200/300');
